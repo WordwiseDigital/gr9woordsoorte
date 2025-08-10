@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SociaLeer: Woordsoorte</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #ff6b6b, #ffa726);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .lesson-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .lesson-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .social-post {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .profile-pic {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            margin-right: 15px;
+        }
+
+        .post-content {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .highlighted-word {
+            background: #ffeb3b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .highlighted-word:hover {
+            background: #ffc107;
+            transform: scale(1.05);
+        }
+
+        .word-type {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .selfstandige-naamwoord {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .werkwoord {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .byvoeglike-naamwoord {
+            background: #e8f5e8;
+            color: #388e3c;
+        }
+
+        .voornaamwoord {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .bywoord {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .voorsetsel {
+            background: #f1f8e9;
+            color: #689f38;
+        }
+
+        .voegwoord {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        .tussenwerpsel {
+            background: #e0f2f1;
+            color: #00695c;
+        }
+
+        .quiz-section {
+            margin-top: 30px;
+        }
+
+        .question {
+            background: #f8f9fa;
+            border-left: 5px solid #007bff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .option {
+            background: white;
+            border: 2px solid #e9ecef;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .option:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,123,255,0.2);
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #007bff, #6610f2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,123,255,0.3);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            transition: width 0.5s ease;
+            border-radius: 5px;
+        }
+
+        .explanation {
+            background: #e7f3ff;
+            border: 1px solid #b8daff;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .score {
+            text-align: center;
+            font-size: 1.5em;
+            color: #28a745;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .word-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .word-type-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #007bff;
+        }
+
+        .likes {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            color: #666;
+        }
+
+        .like-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .like-btn:hover {
+            color: #ff6b6b;
+        }
+
+        .quiz-word {
+            background: #ffeb3b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 SociaLeer</h1>
+            <p>Leer Woordsoorte met jou gunsteling sosiale media!</p>
+        </div>
+
+        <div class="content">
+            <!-- Lesson 1: Introduction -->
+            <div class="lesson-section active" id="lesson1">
+                <h2>📖 Wat is Woordsoorte?</h2>
+                <p>Woordsoorte is die verskillende kategorieë waarin ons woorde verdeel volgens hulle funksie in 'n sin. Kom ons kyk na 'n tipiese sosiale media pos:</p>
+
+                <div class="social-post">
+                    <div class="post-header">
+                        <div class="profile-pic">LM</div>
+                        <div>
+                            <strong>Lerato_M</strong>
+                            <div style="color: #666; font-size: 0.9em;">5 minute gelede</div>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <span class="highlighted-word selfstandige-naamwoord">Ek</span> het vandag 'n <span class="highlighted-word selfstandige-naamwoord">selfie</span> by die <span class="highlighted-word selfstandige-naamwoord">strand</span> <span class="highlighted-word werkwoord">geneem</span>! Die <span class="highlighted-word selfstandige-naamwoord">son</span> was so <span class="highlighted-word byvoeglike-naamwoord">mooi</span> 😍
+                    </div>
+                    <div class="likes">
+                        <button class="like-btn">❤️ 24</button>
+                        <span>💬 5 kommentare</span>
+                    </div>
+                </div>
+
+                <h3>Die 8 Hoofredes van Woordsoorte in Afrikaans:</h3>
+                <div class="word-types-grid">
+                    <div class="word-type-card">
+                        <h4><span class="word-type selfstandige-naamwoord">Selfstandige Naamwoord</span></h4>
+                        <p>Persone, plekke, dinge of idees</p>
+                        <strong>Voorbeelde:</strong> selfie, strand, son, app, vriende
+                    </div>
+                    <div class="word-type-card">
+                        <h4><span class="word-type werkwoord">Werkwoord</span></h4>
+                        <p>Aksies of toestande</p>
+                        <strong>Voorbeelde:</strong> post, like, deel, volg, kyk
+                    </div>
+                    <div class="word-type-card">
+                        <h4><span class="word-type byvoeglike-naamwoord">Byvoeglike Naamwoord</span></h4>
+                        <p>Beskryf selfstandige naamwoorde</p>
+                        <strong>Voorbeelde:</strong> mooi, awesome, viral, trending
+                    </div>
+                    <div class="word-type-card">
+                        <h4><span class="word-type voornaamwoord">Voornaamwoord</span></h4>
+                        <p>Vervang selfstandige naamwoorde</p>
+                        <strong>Voorbeelde:</strong> ek, jy, hulle, sy, dit
+                    </div>
+                </div>
+
+                <button class="btn" onclick="nextLesson()">Volgende: Leer meer woordsoorte 📚</button>
+            </div>
+
+            <!-- Lesson 2: More Word Types -->
+            <div class="lesson-section" id="lesson2">
+                <h2>📝 Meer Woordsoorte</h2>
+                
+                <div class="social-post">
+                    <div class="post-header">
+                        <div class="profile-pic">TK</div>
+                        <div>
+                            <strong>Thabo_K</strong>
+                            <div style="color: #666; font-size: 0.9em;">2 ure gelede</div>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <span class="highlighted-word voornaamwoord">Ons</span> het <span class="highlighted-word bywoord">gister</span> <span class="highlighted-word voorsetsel">na</span> die <span class="highlighted-word selfstandige-naamwoord">konsert</span> <span class="highlighted-word werkwoord">gegaan</span>, <span class="highlighted-word voegwoord">en</span> dit was <span class="highlighted-word byvoeglike-naamwoord">amazing</span>! <span class="highlighted-word tussenwerpsel">Wow</span>, die <span class="highlighted-word selfstandige-naamwoord">musiek</span> was <span class="highlighted-word bywoord">regtig</span> <span class="highlighted-word byvoeglike-naamwoord">goed</span>! 🎵
+                    </div>
+                    <div class="likes">
+                        <button class="like-btn">❤️ 87</button>
+                        <span>💬 12 kommentare</span>
+                    </div>
+                </div>
+
+                <div class="word-types-grid">
+                    <div class="word-type-card">
+                        <h4><span class="word-type bywoord">Bywoord</span></h4>
+                        <p>Beskryf werkwoorde, byvoeglike naamwoorde of ander bywoorde</p>
+                        <strong>Voorbeelde:</strong> gister, vinnig, baie, regtig, altyd
+                    </div>
+                    <div class="word-type-card">
+                        <h4><span class="word-type voorsetsel">Voorsetsel</span></h4>
+                        <p>Toon verhoudings tussen woorde</p>
+                        <strong>Voorbeelde:</strong> na, by, in, op, met, van
+                    </div>
+                    <div class="word-type-card">
+                        <h4><span class="word-type voegwoord">Voegwoord</span></h4>
+                        <p>Verbind woorde, frases of sinne</p>
+                        <strong>Voorbeelde:</strong> en, maar, of, omdat, terwyl
+                    </div>
+                    <div class="word-type-card">
+                        <h4><span class="word-type tussenwerpsel">Tussenwerpsel</span></h4>
+                        <p>Uitdrukking van emosie</p>
+                        <strong>Voorbeelde:</strong> Wow! Ag! Eish! Sjoe! Aai!
+                    </div>
+                </div>
+
+                <button class="btn" onclick="nextLesson()">Reg vir die toets? 🎯</button>
+            </div>
+
+            <!-- Quiz Section -->
+            <div class="lesson-section" id="quiz">
+                <h2>🎮 Toets jou kennis!</h2>
+                <div class="progress-bar">
+                    <div class="progress" id="progress" style="width: 0%"></div>
+                </div>
+                
+                <div id="quiz-content">
+                    <!-- Quiz questions will be loaded here -->
+                </div>
+
+                <div class="score" id="final-score" style="display: none;">
+                    <p>Jou finale telling: <span id="score-display">0</span>/10</p>
+                    <button class="btn" onclick="restartQuiz()">Probeer weer 🔄</button>
+                    <button class="btn" onclick="backToLessons()">Terug na lesse 📚</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLesson = 1;
+        let currentQuestion = 0;
+        let score = 0;
+        
+        const quizQuestions = [
+            {
+                post: {
+                    user: "Sarah_V",
+                    content: "My <span class='quiz-word'>nuwe</span> foon is so cool! 📱",
+                    word: "nuwe"
+                },
+                question: "Watter woordsoort is die woord 'nuwe'?",
+                options: ["Selfstandige Naamwoord", "Byvoeglike Naamwoord", "Werkwoord", "Bywoord"],
+                correct: 1,
+                explanation: "'Nuwe' is 'n byvoeglike naamwoord omdat dit die selfstandige naamwoord 'foon' beskryf."
+            },
+            {
+                post: {
+                    user: "Mike_2024",
+                    content: "<span class='quiz-word'>Hulle</span> gaan môre na die mall.",
+                    word: "Hulle"
+                },
+                question: "Watter woordsoort is die woord 'Hulle'?",
+                options: ["Selfstandige Naamwoord", "Voornaamwoord", "Werkwoord", "Voorsetsel"],
+                correct: 1,
+                explanation: "'Hulle' is 'n voornaamwoord omdat dit na 'n groep mense verwys sonder om hulle name te noem."
+            },
+            {
+                post: {
+                    user: "Lisa_Cool",
+                    content: "Ek het vinnig my homework <span class='quiz-word'>gedoen</span>.",
+                    word: "gedoen"
+                },
+                question: "Watter woordsoort is die woord 'gedoen'?",
+                options: ["Selfstandige Naamwoord", "Byvoeglike Naamwoord", "Werkwoord", "Bywoord"],
+                correct: 2,
+                explanation: "'Gedoen' is 'n werkwoord omdat dit 'n aksie beskryf wat uitgevoer is."
+            },
+            {
+                post: {
+                    user: "Ahmed_A",
+                    content: "Die <span class='quiz-word'>musiek</span> by die party was awesome!",
+                    word: "musiek"
+                },
+                question: "Watter woordsoort is die woord 'musiek'?",
+                options: ["Selfstandige Naamwoord", "Byvoeglike Naamwoord", "Werkwoord", "Bywoord"],
+                correct: 0,
+                explanation: "'Musiek' is 'n selfstandige naamwoord omdat dit 'n ding is wat jy kan hoor."
+            },
+            {
+                post: {
+                    user: "Zara_Z",
+                    content: "Ons het <span class='quiz-word'>gister</span> lekker gekuier.",
+                    word: "gister"
+                },
+                question: "Watter woordsoort is die woord 'gister'?",
+                options: ["Selfstandige Naamwoord", "Byvoeglike Naamwoord", "Werkwoord", "Bywoord"],
+                correct: 3,
+                explanation: "'Gister' is 'n bywoord omdat dit sê wanneer die aksie plaasgevind het."
+            },
+            {
+                post: {
+                    user: "Ryan_R",
+                    content: "Ek gaan <span class='quiz-word'>na</span> die movies toe.",
+                    word: "na"
+                },
+                question: "Watter woordsoort is die woord 'na'?",
+                options: ["Voorsetsel", "Voegwoord", "Werkwoord", "Tussenwerpsel"],
+                correct: 0,
+                explanation: "'Na' is 'n voorsetsel omdat dit die verhouding tussen 'gaan' en 'movies' toon."
+            },
+            {
+                post: {
+                    user: "Emma_E",
+                    content: "Ek hou van pizza <span class='quiz-word'>en</span> burgers.",
+                    word: "en"
+                },
+                question: "Watter woordsoort is die woord 'en'?",
+                options: ["Voorsetsel", "Voegwoord", "Werkwoord", "Bywoord"],
+                correct: 1,
+                explanation: "'En' is 'n voegwoord omdat dit twee woorde ('pizza' en 'burgers') verbind."
+            },
+            {
+                post: {
+                    user: "David_D",
+                    content: "<span class='quiz-word'>Wow</span>! Daai movie was ongelooflik!",
+                    word: "Wow"
+                },
+                question: "Watter woordsoort is die woord 'Wow'?",
+                options: ["Selfstandige Naamwoord", "Voegwoord", "Tussenwerpsel", "Bywoord"],
+                correct: 2,
+                explanation: "'Wow' is 'n tussenwerpsel omdat dit 'n uitroep van verrassing of bewondering is."
+            },
+            {
+                post: {
+                    user: "Fatima_F",
+                    content: "My ma is <span class='quiz-word'>baie</span> trots op my.",
+                    word: "baie"
+                },
+                question: "Watter woordsoort is die woord 'baie' in hierdie sin?",
+                options: ["Selfstandige Naamwoord", "Byvoeglike Naamwoord", "Bywoord", "Voornaamwoord"],
+                correct: 2,
+                explanation: "'Baie' is hier 'n bywoord omdat dit die byvoeglike naamwoord 'trots' beskryf (hoe trots sy is)."
+            },
+            {
+                post: {
+                    user: "Jason_J",
+                    content: "<span class='quiz-word'>Dit</span> was die beste dag ooit!",
+                    word: "Dit"
+                },
+                question: "Watter woordsoort is die woord 'Dit'?",
+                options: ["Selfstandige Naamwoord", "Voornaamwoord", "Werkwoord", "Byvoeglike Naamwoord"],
+                correct: 1,
+                explanation: "'Dit' is 'n voornaamwoord omdat dit na iets verwys sonder om dit spesifiek te noem."
+            }
+        ];
+
+        function nextLesson() {
+            document.getElementById('lesson' + currentLesson).classList.remove('active');
+            currentLesson++;
+            if (currentLesson <= 2) {
+                document.getElementById('lesson' + currentLesson).classList.add('active');
+            } else {
+                startQuiz();
+            }
+        }
+
+        function startQuiz() {
+            document.getElementById('quiz').classList.add('active');
+            currentQuestion = 0;
+            score = 0;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestion >= quizQuestions.length) {
+                showFinalScore();
+                return;
+            }
+
+            const question = quizQuestions[currentQuestion];
+            const progress = ((currentQuestion) / quizQuestions.length) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+
+            document.getElementById('quiz-content').innerHTML = `
+                <div class="social-post">
+                    <div class="post-header">
+                        <div class="profile-pic">${question.post.user.substring(0,2).toUpperCase()}</div>
+                        <div>
+                            <strong>${question.post.user}</strong>
+                            <div style="color: #666; font-size: 0.9em;">Net nou</div>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        ${question.post.content}
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>Vraag ${currentQuestion + 1} van ${quizQuestions.length}</h3>
+                    <p>${question.question}</p>
+                    <div class="options">
+                        ${question.options.map((option, index) => 
+                            `<div class="option" onclick="selectAnswer(${index})">${option}</div>`
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectAnswer(selectedIndex) {
+            const question = quizQuestions[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach((option, index) => {
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && index !== question.correct) {
+                    option.classList.add('incorrect');
+                }
+                option.style.pointerEvents = 'none';
+            });
+
+            if (selectedIndex === question.correct) {
+                score++;
+            }
+
+            // Show explanation
+            setTimeout(() => {
+                document.getElementById('quiz-content').innerHTML += `
+                    <div class="explanation">
+                        <strong>Verduideliking:</strong> ${question.explanation}
+                    </div>
+                    <button class="btn" onclick="nextQuestion()" style="margin-top: 15px;">
+                        ${currentQuestion + 1 >= quizQuestions.length ? 'Sien resultate 🏆' : 'Volgende vraag ➡️'}
+                    </button>
+                `;
+            }, 1500);
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        function showFinalScore() {
+            document.getElementById('progress').style.width = '100%';
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('final-score').style.display = 'block';
+            document.getElementById('score-display').textContent = score;
+            
+            let message = '';
+            if (score >= 8) {
+                message = '🏆 Uitstekend! Jy het woordsoorte baie goed bemeester!';
+            } else if (score >= 6) {
+                message = '👍 Goed gedaan! Jy verstaan die meeste woordsoorte.';
+            } else {
+                message = '📚 Oefen nog \'n bietjie. Gaan terug na die lesse!';
+            }
+            
+            document.getElementById('final-score').innerHTML = `
+                <p>${message}</p>
+                <p>Jou finale telling: <span id="score-display">${score}</span>/${quizQuestions.length}</p>
+                <button class="btn" onclick="restartQuiz()">Probeer weer 🔄</button>
+                <button class="btn" onclick="backToLessons()">Terug na lesse 📚</button>
+            `;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('final-score').style.display = 'none';
+            loadQuestion();
+        }
+
+        function backToLessons() {
+            document.getElementById('quiz').classList.remove('active');
+            document.getElementById('lesson1').classList.add('active');
+            currentLesson = 1;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('final-score').style.display = 'none';
+        }
+
+        // Add some interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click events to highlighted words in lessons
+            document.querySelectorAll('.highlighted-word').forEach(word => {
+                word.addEventListener('click', function() {
+                    const wordType = this.className.split(' ')[1];
+                    const wordTypeNames = {
+                        'selfstandige-naamwoord': 'Selfstandige Naamwoord',
+                        'werkwoord': 'Werkwoord',
+                        'byvoeglike-naamwoord': 'Byvoeglike Naamwoord',
+                        'voornaamwoord': 'Voornaamwoord',
+                        'bywoord': 'Bywoord',
+                        'voorsetsel': 'Voorsetsel',
+                        'voegwoord': 'Voegwoord',
+                        'tussenwerpsel': 'Tussenwerpsel'
+                    };
+                    alert(`Dit is 'n ${wordTypeNames[wordType]}!`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
